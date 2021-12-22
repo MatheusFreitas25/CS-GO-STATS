@@ -2,11 +2,6 @@ import pandas as pd
 import json
 
 log = open(r'console.log')
-full = log.readlines()
-log.close()
-
-
-log = open(r'console.log')
 last = (0, 'inicio')
 start_list = list()
 end_list = list()
@@ -40,23 +35,40 @@ for lineno, line in enumerate(log):
 
             last = (lineno, curr)
 
-
 print(start_list)
 print(end_list)
+
+log = open(r'console.log')
+full = log.readlines()
+log.close()
 
 if len(start_list) == len(end_list):
     for i in range(len(start_list)):
         match = full[start_list[i]: end_list[i]]
 
         data = match[0].split(' get5_event: ')[1]
+
         data = json.loads(data)
         match_id = data['matchid`']
         horario = match[0][2:20].replace('/', '-')
         horario = horario.replace(' - ', ' ')
         horario = horario.replace(':', '-')
 
-        f = open(f'matches\\{i} - {horario} - {match_id}.log', 'w')
-        f.writelines(match)
+        data2 = data
+        try:
+            data2 = json.loads(match[-1].split(' get5_event: ')[1])
+        except IndexError:
+            pass
+
+        x = ''
+        if data['event'] == 'series_start' and data2['event'] == 'series_end':
+            x = ' full_match'
+
+        if data['event'] == 'series_start' and \
+                (data2['event'] == 'series_end' or
+                 data2['event'] == 'map_end'):
+            f = open(f'matches\\{i} - {horario} - {match_id}{x}.log', 'w')
+            f.writelines(match)
 
 
 
