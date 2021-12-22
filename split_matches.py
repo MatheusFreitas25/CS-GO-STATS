@@ -14,10 +14,10 @@ end_list = list()
 
 for lineno, line in enumerate(log):
     if 'get5_event:' in line:
+
         data = line.split(' get5_event: ')[1]
         data = json.loads(data)
         curr = data['event']
-
         if curr in ['series_start',
                     'going_live',
                     # 'round_end',
@@ -47,7 +47,15 @@ print(end_list)
 if len(start_list) == len(end_list):
     for i in range(len(start_list)):
         match = full[start_list[i]: end_list[i]]
-        f = open(f'matches\\{i}.log', 'w')
+
+        data = match[0].split(' get5_event: ')[1]
+        data = json.loads(data)
+        match_id = data['matchid`']
+        horario = match[0][2:20].replace('/', '-')
+        horario = horario.replace(' - ', ' ')
+        horario = horario.replace(':', '-')
+
+        f = open(f'matches\\{i} - {horario} - {match_id}.log', 'w')
         f.writelines(match)
 
 
