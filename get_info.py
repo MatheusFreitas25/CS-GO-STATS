@@ -55,7 +55,7 @@ player_events = ['attacked', 'threw flashbang', 'blinded', 'killed', 'left buyzo
 
 df = pd.DataFrame()
 
-# for ev in events:
+
 df = df.append(events, ignore_index=True, sort=False)
 df[~pd.isna(df['type'])].to_csv('eventos.csv', index=False, sep=';')
 

@@ -23,6 +23,9 @@ class Event:
         self.victim_health = self.get_victim_health()
         self.victim_armor = self.get_victim_armor()
         self.hitgroup = self.get_hitgroup()
+        self.hs = self.get_hs()
+        self.penetrated = self.get_penetrated()
+        self.throughsmoke = self.get_throughsmoke()
         self.author_coord = self.get_author_coord()
         self.victim_coord = self.get_victim_coord()
         self.author_side = self.get_author_side()
@@ -50,6 +53,15 @@ class Event:
         for event in player_events:
             if event in self.line:
                 return event
+
+    def get_penetrated(self):
+        return 1 if 'penetrated' in self.line else 0
+
+    def get_hs(self):
+        return 1 if 'headshot' in self.line else 0
+
+    def get_throughsmoke(self):
+        return 1 if 'throughsmoke' in self.line else 0
 
     def get_time(self):
         try:
