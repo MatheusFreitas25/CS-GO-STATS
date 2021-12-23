@@ -17,6 +17,7 @@ for lineno, line in enumerate(log):
         data = line.split(' get5_event: ')[1]
         data = json.loads(data)
         curr = data['event']
+
         if curr == 'series_start':
             moment = 'map_vetoing'
             mapnumber = 0
@@ -24,9 +25,9 @@ for lineno, line in enumerate(log):
             match_id = data['matchid`']
 
         elif curr == 'going_live':
-            moment = 'live'
+            moment = 'warmup'
             mapnumber += 1
-            round = 1
+            round = 0
             map_name = data['params']['map_name']
             match_id = data['matchid`']
 
@@ -37,7 +38,8 @@ for lineno, line in enumerate(log):
         moment = 'freeze_time'
         round += 1
     elif 'World triggered "Round_Start"' in line:
-        moment = 'live'
+        if moment == 'freeze_time':
+            moment = 'live'
     else:
         event = Event(line, lineno, moment, mapnumber, round, map_name, match_id)
         events.append(event.to_dict())
@@ -52,8 +54,9 @@ player_events = ['attacked', 'threw flashbang', 'blinded', 'killed', 'left buyzo
                  'threw decoy', 'Begin_Bomb_Defuse_Without_Kit']
 
 df = pd.DataFrame()
-for ev in events:
-    df = df.append(ev, ignore_index=True)
-df[~pd.isna(df['type'])].to_csv('eventos.csv', index=False)
+
+# for ev in events:
+df = df.append(events, ignore_index=True, sort=False)
+df[~pd.isna(df['type'])].to_csv('eventos.csv', index=False, sep=';')
 
 
