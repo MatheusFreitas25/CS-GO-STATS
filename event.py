@@ -11,10 +11,20 @@ class Event:
         self.map_name = map_name
         self.match_id = match_id
         self.type = self.get_type()
-        self.author_id = self.get_author_id()
-        self.author_name = self.get_author_name()
-        self.victim_id = self.get_victim_id()
-        self.victim_name = self.get_victim_name()
+        if self.type != 'blinded':
+            self.author_name = self.get_author_name()
+            self.author_id = self.get_author_id()
+        else:
+            self.author_name = self.get_victim_name()
+            self.author_id = self.get_victim_id()
+
+        if self.type != 'blinded':
+            self.victim_id = self.get_victim_id()
+            self.victim_name = self.get_victim_name()
+        else:
+            self.victim_name = self.get_author_name()
+            self.victim_id = self.get_author_id()
+
         self.weapon = self.get_weapon()
         self.damage = self.get_damage()
         self.blinded_time = self.get_blinded_time()
