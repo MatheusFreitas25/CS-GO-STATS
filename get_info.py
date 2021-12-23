@@ -11,6 +11,8 @@ mapnumber = 0
 round = 0
 map_name = ''
 match_id = '0'
+dead_t = 0
+dead_ct = 0
 
 for lineno, line in enumerate(log):
     if 'get5_event' in line:
@@ -37,11 +39,17 @@ for lineno, line in enumerate(log):
     elif 'Starting Freeze period' in line:
         moment = 'freeze_time'
         round += 1
+        dead_ct = 0
+        dead_t = 0
     elif 'World triggered "Round_Start"' in line:
         if moment == 'freeze_time':
             moment = 'live'
     else:
         event = Event(line, lineno, moment, mapnumber, round, map_name, match_id)
+        if event.type == 'killed' and event.victim_side == 'CT':
+            dead_ct += 1
+        if event.type == 'killed' and event.victim_side == 'TERRORIST':
+            dead_t += 1
         events.append(event.to_dict())
 
 types = list()

@@ -14,16 +14,20 @@ class Event:
         if self.type != 'blinded':
             self.author_name = self.get_author_name()
             self.author_id = self.get_author_id()
+            self.author_side = self.get_author_side()
         else:
             self.author_name = self.get_victim_name()
             self.author_id = self.get_victim_id()
+            self.author_side = self.get_victim_side()
 
         if self.type != 'blinded':
             self.victim_id = self.get_victim_id()
             self.victim_name = self.get_victim_name()
+            self.victim_side = self.get_victim_side()
         else:
             self.victim_name = self.get_author_name()
             self.victim_id = self.get_author_id()
+            self.victim_side = self.get_author_side()
 
         self.weapon = self.get_weapon()
         self.damage = self.get_damage()
@@ -38,8 +42,6 @@ class Event:
         self.throughsmoke = self.get_throughsmoke()
         self.author_coord = self.get_author_coord()
         self.victim_coord = self.get_victim_coord()
-        self.author_side = self.get_author_side()
-        self.victim_side = self.get_victim_side()
         self.time = self.get_time()
 
     def to_dict(self):
@@ -111,7 +113,7 @@ class Event:
 
     def get_victim_side(self):
         try:
-            m = re.findall('<(.?)>', self.line)
+            m = re.findall('<(.+?)>', self.line)
             if m:
                 result = m[5]
                 return result
