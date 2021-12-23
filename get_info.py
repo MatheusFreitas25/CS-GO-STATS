@@ -1,221 +1,59 @@
-import re
+from event import Event
 import pandas as pd
+import json
 
 log = open(r'matches\5 - 12-21-2021 19-34 - bo3 full_match.log')
 
+events = list()
 
-class Event:
-    def __init__(self, txt, lnum=None):
-        self.line = txt
-        self.lineno = lnum
-        self.type = self.get_type()
-        self.author_id = self.get_author_id()
-        self.author_name = self.get_author_name()
-        self.victim_id = self.get_victim_id()
-        self.victim_name = self.get_victim_name()
-        self.weapon = self.get_weapon()
-        self.damage = self.get_damage()
-        self.blinded_time = self.get_blinded_time()
-        self.flashbang_id = self.get_flashbang_id()
-        self.damage_armor = self.get_damage_armor()
-        self.victim_health = self.get_victim_health()
-        self.victim_armor = self.get_victim_armor()
-        self.hitgroup = self.get_hitgroup()
-        self.author_coord = self.get_author_coord()
-        self.victim_coord = self.get_victim_coord()
-        self.author_side = self.get_author_side()
-        self.victim_side = self.get_victim_side()
-        self.time = self.get_time()
+moment = 'pre_series'
+mapnumber = 0
+round = 0
+map_name = ''
+match_id = '0'
 
-    def to_dict(self):
-        attributes = vars(self)
-        del attributes['line']
-        x = list(attributes.keys())
-        for key in x:
-            if attributes[key] is None:
-                del attributes[key]
-        return attributes
+for lineno, line in enumerate(log):
+    if 'get5_event' in line:
+        data = line.split(' get5_event: ')[1]
+        data = json.loads(data)
+        curr = data['event']
+        if curr == 'series_start':
+            moment = 'map_vetoing'
+            mapnumber = 0
+            round = 0
+            match_id = data['matchid`']
 
-    def get_type(self):
-        player_events = ['attacked', 'threw flashbang', 'blinded', 'killed', 'left buyzone', 'say_team', 'say',
-                         'threw molotov',
-                         'threw hegrenade', 'threw smokegrenade', 'purchased', 'Dropped_The_Bomb', 'Got_The_Bomb',
-                         'switched from team', 'assisted killing', 'Planted_The_Bomb', 'Bomb_Begin_Plant',
-                         'flash-assisted killing',
-                         'Begin_Bomb_Defuse_With_Kit', 'Defused_The_Bomb', 'entered the game', 'disconnected',
-                         'threw decoy', 'Begin_Bomb_Defuse_Without_Kit']
+        elif curr == 'going_live':
+            moment = 'live'
+            mapnumber += 1
+            round = 1
+            map_name = data['params']['map_name']
+            match_id = data['matchid`']
 
-        for event in player_events:
-            if event in self.line:
-                return event
+        elif curr == 'round_end':
+            moment = 'round_ended'
 
-    def get_time(self):
-        try:
-            m = re.findall('L (.+?): "', self.line)
-            if m:
-                result = m[0]
-                return result
-        except IndexError:
-            return None
+    elif 'Starting Freeze period' in line:
+        moment = 'freeze_time'
+        round += 1
+    elif 'World triggered "Round_Start"' in line:
+        moment = 'live'
+    else:
+        event = Event(line, lineno, moment, mapnumber, round, map_name, match_id)
+        events.append(event.to_dict())
 
-    def get_blinded_time(self):
-        try:
-            m = re.findall('blinded for (.+?) by', self.line)
-            if m:
-                result = float(m[0])
-                return result
-        except IndexError:
-            return None
+types = list()
+player_events = ['attacked', 'threw flashbang', 'blinded', 'killed', 'left buyzone', 'say_team', 'say',
+                 'threw molotov', 'committed suicide', 'changed name',
+                 'threw hegrenade', 'threw smokegrenade', 'purchased', 'Dropped_The_Bomb', 'Got_The_Bomb',
+                 'switched from team', 'assisted killing', 'Planted_The_Bomb', 'Bomb_Begin_Plant',
+                 'flash-assisted killing',
+                 'Begin_Bomb_Defuse_With_Kit', 'Defused_The_Bomb', 'entered the game', 'disconnected',
+                 'threw decoy', 'Begin_Bomb_Defuse_Without_Kit']
 
-    def get_flashbang_id(self):
-        try:
-            m = re.findall('flashbang entindex (.+?) ', self.line)
-            if m:
-                result = int(m[0])
-                return result
-        except IndexError:
-            return None
-
-    def get_author_side(self):
-        try:
-            m = re.findall('<(.+?)>', self.line)
-            if m:
-                result = m[2]
-                return result
-        except IndexError:
-            return None
-
-    def get_victim_side(self):
-        try:
-            m = re.findall('<(.?)>', self.line)
-            if m:
-                result = m[5]
-                return result
-        except IndexError:
-            return None
-
-    def get_author_id(self):
-        try:
-            m = re.findall('<(.+?)>', self.line)
-            if m:
-                result = m[1]
-                return result
-        except IndexError:
-            return None
-
-    def get_author_name(self):
-        try:
-            m = re.findall(' "(.+?)<', self.line)
-            if m:
-                result = m[0]
-                return result
-        except IndexError:
-            return None
-
-    def get_weapon(self):
-        try:
-            m = re.findall(' with "(.+?)" ', self.line)
-            if m:
-                result = m[0]
-                return result
-        except IndexError:
-            return None
-
-    def get_victim_id(self):
-        try:
-            m = re.findall('<(.+?)>', self.line)
-            if m:
-                result = m[4]
-                return result
-        except IndexError:
-            return None
-
-    def get_victim_name(self):
-        try:
-            m = re.findall(' "(.+?)<', self.line)
-            if m:
-                result = m[1]
-                return result
-        except IndexError:
-            return None
-
-    def get_damage(self):
-        try:
-            m = re.findall('\(damage "(.+?)"\)', self.line)
-            if m:
-                result = int(m[0])
-                return result
-        except IndexError:
-            return None
-
-    def get_damage_armor(self):
-        try:
-            m = re.findall('\(damage_armor "(.+?)"\)', self.line)
-            if m:
-                result = int(m[0])
-                return result
-        except IndexError:
-            return None
-
-    def get_victim_health(self):
-        try:
-            m = re.findall('\(health "(.+?)"\)', self.line)
-            if m:
-                result = int(m[0])
-                return result
-        except IndexError:
-            return None
-
-    def get_victim_armor(self):
-        try:
-            m = re.findall('\(armor "(.+?)"\)', self.line)
-            if m:
-                result = int(m[0])
-                return result
-        except IndexError:
-            return None
-
-    def get_hitgroup(self):
-        try:
-            m = re.findall('\(hitgroup "(.+?)"\)', self.line)
-            if m:
-                result = m[0]
-                return result
-        except IndexError:
-            return None
-
-    def get_author_coord(self):
-        try:
-            m = re.findall(' \[(.+?)\] ', self.line)
-            if m:
-                result = tuple(m[0].split())
-                return result
-        except IndexError:
-            return None
-
-    def get_victim_coord(self):
-        try:
-            m = re.findall(' \[(.+?)\] ', self.line)
-            if m:
-                result = tuple(m[1].split())
-                return result
-        except IndexError:
-            return None
-
-
-if __name__ == '__main__':
-    attacks = list()
-
-    for lineno, line in enumerate(log):
-        if 'get5_event' not in line:
-            attack = Event(line, lineno)
-            attacks.append(attack.to_dict())
-
-    for i in attacks:
-        print(i)
-
-    # df = pd.DataFrame()
-    # df = df.append(attacks)
-    # print(df)
+df = pd.DataFrame()
+for ev in events:
+    df = df.append(ev, ignore_index=True)
+df[~pd.isna(df['type'])].to_csv('eventos.csv', index=False)
 
 
