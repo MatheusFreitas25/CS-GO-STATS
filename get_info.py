@@ -1,6 +1,8 @@
 from event import Event
+from utils import insert_to_database
 import pandas as pd
 import json
+
 
 log = open(r'matches\5 - 12-21-2021 19-34 - bo3 full_match.log')
 
@@ -9,7 +11,7 @@ events = list()
 moment = 'pre_series'
 mapnumber = 0
 round = 0
-map_name = ''
+map_name = 'undefined'
 match_id = '0'
 dead_t = 0
 dead_ct = 0
@@ -63,8 +65,16 @@ player_events = ['attacked', 'threw flashbang', 'blinded', 'killed', 'left buyzo
 
 df = pd.DataFrame()
 
-
 df = df.append(events, ignore_index=True, sort=False)
-df[~pd.isna(df['type'])].to_csv('eventos.csv', index=False, sep=';')
+
+df = df[['lineno', 'time', 'moment', 'mapnumber', 'round', 'map_name', 'match_id', 'type', 'author_name', 'author_id',
+         'author_side', 'victim_id', 'victim_name', 'victim_side', 'weapon', 'damage', 'blinded_time', 'flashbang_id',
+         'damage_armor', 'victim_health', 'victim_armor', 'hitgroup', 'hs', 'penetrated', 'throughsmoke',
+         'author_coord', 'victim_coord']]
+
+
+insert_to_database(df)
+
+# df[~pd.isna(df['type'])].to_csv('eventos.csv', index=False, sep=';')
 
 
