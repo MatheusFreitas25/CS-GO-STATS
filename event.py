@@ -77,7 +77,7 @@ class Event:
 
     def get_time(self):
         try:
-            m = re.findall('L (.+?): "', self.line)
+            m = re.findall('L (.+?): ', self.line)
             if m:
                 result = m[0]
                 return result
@@ -140,7 +140,7 @@ class Event:
 
     def get_weapon(self):
         try:
-            m = re.findall(' with "(.+?)" ', self.line)
+            m = re.findall(' with "(.+?)"', self.line)
             if m:
                 result = m[0]
                 return result

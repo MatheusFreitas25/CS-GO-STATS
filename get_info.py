@@ -38,11 +38,18 @@ for lineno, line in enumerate(log):
         elif curr == 'round_end':
             moment = 'round_ended'
 
+        elif curr == 'map_end':
+            moment = 'map_ended'
+            round = 0
+
     elif 'Starting Freeze period' in line:
         moment = 'freeze_time'
         round += 1
         dead_ct = 0
         dead_t = 0
+    elif 'World triggered "Match_Start"' in line:
+        moment = 'warmup'
+        round = 0
     elif 'World triggered "Round_Start"' in line:
         if moment == 'freeze_time':
             moment = 'live'
