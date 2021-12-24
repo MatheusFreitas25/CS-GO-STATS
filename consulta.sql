@@ -6,6 +6,8 @@ select mapnumber
 	 , map_name
 	 , max(author_name) nome
 	 , sum(case when "type" = 'threw flashbang' then 1 else 0 end) flashbangs_usadas
+	 , COUNT(DISTINCT(case when "type" = 'blinded' and author_side <> victim_side AND VICTIM_side in ('CT', 'TERRORIST') then flashbang_id else NULL end)) flash_cegou_inimigo
+	 , COUNT(DISTINCT(case when "type" = 'blinded' and author_side = victim_side then flashbang_id else NULL end)) flash_cegou_amigo
 	 , sum(case when "type" = 'blinded' and author_side = victim_side then 1 else 0 end) amigos_cegados
 	 , sum(case when "type" = 'blinded' and author_side <> victim_side AND VICTIM_side in ('CT', 'TERRORIST') then 1 else 0 end) inimigos_cegados
 	 , sum(case when "type" = 'blinded' and author_side = victim_side then blinded_time else 0 end) amigos_cegados_tempo
@@ -21,9 +23,9 @@ select mapnumber
 	 , SUM(case when "type" = 'Dropped_The_Bomb' then 1 else 0 end) c4_dropada
 	 , SUM(case when "type" = 'Bomb_Begin_Plant' then 1 else 0 end) tentativa_plant_c4
 	 , SUM(case when "type" = 'Planted_The_Bomb' then 1 else 0 end) plantou_c4
-	 , SUM(case when "type" = 'attacked' then 1 else 0 end) tiros_acertados
-	 , SUM(case when "type" = 'attacked' and hitgroup in ('left leg', 'right leg') then 1 else 0 end) tiros_na_perna
-	 , SUM(case when "type" = 'attacked' and hitgroup in ('head') then 1 else 0 end) tiros_na_cabeca
+	 , SUM(case when "type" = 'attacked' and weapon not in ('flashbang', 'hegrenade', 'inferno') then 1 else 0 end) tiros_acertados
+	 , SUM(case when "type" = 'attacked' and weapon not in ('flashbang', 'hegrenade', 'inferno') and hitgroup in ('left leg', 'right leg') then 1 else 0 end) tiros_na_perna
+	 , SUM(case when "type" = 'attacked' and weapon not in ('flashbang', 'hegrenade', 'inferno') and hitgroup in ('head') then 1 else 0 end) tiros_na_cabeca
 
 from ALL_EVENTS
 where mapnumber > 0
@@ -44,6 +46,8 @@ select author_id
 	 , mapnumber
 	 , map_name
 	 , sum(flashbangs_usadas) bangs
+	 , sum(flash_cegou_inimigo) flash_cegou_inimigo
+	 , sum(flash_cegou_amigo) flash_cegou_amigo
 	 , sum(amigos_cegados) amigos_cegados
 	 , sum(inimigos_cegados) inimigos_cegados 
 	 , sum(amigos_cegados_tempo) amigos_cegados_tempo
