@@ -12,13 +12,18 @@ select mapnumber
 	 , sum(case when "type" = 'blinded' and author_side <> victim_side AND VICTIM_side in ('CT', 'TERRORIST') then blinded_time else 0 end) inimigos_cegados_tempo
 	 , SUM(case when "type" = 'killed' and author_side = 'CT' and victim_side = 'TERRORIST' then 1 else 0 end) kills_ct
 	 , SUM(case when "type" = 'killed' and victim_side = 'CT' and author_side = 'TERRORIST' then 1 else 0 end) kills_tr
+	 , SUM(case when "type" = 'assisted killing' and author_side = 'CT' and victim_side = 'TERRORIST' then 1 else 0 end) assists_ct
+	 , SUM(case when "type" = 'assisted killing' and victim_side = 'CT' and author_side = 'TERRORIST' then 1 else 0 end) assists_tr
 	 , COUNT(DISTINCT(case when author_side = 'CT' then "round" else NULL end)) rounds_ct
 	 , COUNT(DISTINCT(case when author_side = 'TERRORIST' then "round" else NULL end)) rounds_tr
 	 , SUM(case when "type" = 'killed' and victim_side <> author_side and throughsmoke = 1 then 1 else 0 end) kills_smoke
 	 , SUM(case when "type" = 'Got_The_Bomb' then 1 else 0 end) pegou_c4
 	 , SUM(case when "type" = 'Dropped_The_Bomb' then 1 else 0 end) c4_dropada
-	 , SUM(case when "type" = 'Bomb_Begin_Plant' then 1 else 0 end) tentativa_plantar
-	 , SUM(case when "type" = 'Planted_The_Bomb' then 1 else 0 end) plantou
+	 , SUM(case when "type" = 'Bomb_Begin_Plant' then 1 else 0 end) tentativa_plant_c4
+	 , SUM(case when "type" = 'Planted_The_Bomb' then 1 else 0 end) plantou_c4
+	 , SUM(case when "type" = 'attacked' then 1 else 0 end) tiros_acertados
+	 , SUM(case when "type" = 'attacked' and hitgroup in ('left leg', 'right leg') then 1 else 0 end) tiros_na_perna
+	 , SUM(case when "type" = 'attacked' and hitgroup in ('head') then 1 else 0 end) tiros_na_cabeca
 
 from ALL_EVENTS
 where mapnumber > 0
@@ -45,13 +50,18 @@ select author_id
 	 , sum(inimigos_cegados_tempo) inimigos_cegados_tempo
 	 , sum(kills_ct) kills_ct
 	 , sum(kills_tr) kills_tr
+	 , sum(assists_ct) assists_ct
+	 , sum(assists_tr) assists_tr
 	 , sum(rounds_ct) rounds_ct
 	 , sum(rounds_tr) rounds_tr
 	 , sum(kills_smoke) kills_smoke
 	 , sum(pegou_c4) pegou_c4
 	 , sum(c4_dropada) c4_dropada
-	 , sum(tentativa_plantar) tentativa_plantar
-	 , sum(plantou) plantou
+	 , sum(tentativa_plant_c4) tentativa_plant_c4
+	 , sum(plantou_c4) plantou_c4
+	 , sum(tiros_acertados) tiros_acertados
+	 , sum(tiros_na_perna) tiros_na_perna
+	 , sum(tiros_na_cabeca) tiros_na_cabeca
 from PLAYER_ROUND
 group by author_id, nome, mapnumber, map_name
 having sum(rounds_ct) + sum(rounds_tr) > 5
