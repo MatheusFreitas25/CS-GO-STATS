@@ -236,7 +236,7 @@ class Event:
         try:
             m = re.findall('left buyzone with \[ (.+?) \]', self.line)
             if m:
-                result = tuple(m[0])
+                result = str(tuple(m[0].split())).replace("'", "")
                 return result
         except IndexError:
             return None
