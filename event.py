@@ -43,6 +43,8 @@ class Event:
         self.author_coord = self.get_author_coord()
         self.victim_coord = self.get_victim_coord()
         self.time = self.get_time()
+        self.equipment = self.get_equipment()
+        self.item_bought = self.get_item_bought()
 
     def to_dict(self):
         attributes = vars(self)
@@ -60,7 +62,9 @@ class Event:
                          'switched from team', 'assisted killing', 'Planted_The_Bomb', 'Bomb_Begin_Plant',
                          'flash-assisted killing',
                          'Begin_Bomb_Defuse_With_Kit', 'Defused_The_Bomb', 'entered the game', 'disconnected',
-                         'threw decoy', 'Begin_Bomb_Defuse_Without_Kit']
+                         'threw decoy', 'Begin_Bomb_Defuse_Without_Kit', 'SFUI_Notice_Terrorists_Win',
+                         'SFUI_Notice_CTs_Win', 'SFUI_Notice_Bomb_Defused', 'SFUI_Notice_Target_Bombed',
+                         'SFUI_Notice_Target_Saved']
 
         for event in player_events:
             if event in self.line:
@@ -224,6 +228,24 @@ class Event:
             m = re.findall(' \[(.+?)\] ', self.line)
             if m:
                 result = tuple(m[1].split())
+                return result
+        except IndexError:
+            return None
+
+    def get_equipment(self):
+        try:
+            m = re.findall('left buyzone with \[ (.+?) \]', self.line)
+            if m:
+                result = tuple(m[0])
+                return result
+        except IndexError:
+            return None
+
+    def get_item_bought(self):
+        try:
+            m = re.findall('purchased "(.+?)"', self.line)
+            if m:
+                result = m[0]
                 return result
         except IndexError:
             return None

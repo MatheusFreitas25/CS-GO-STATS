@@ -24,14 +24,14 @@ def insert_to_database(df):
                             'author_name', 'author_id', 'author_side', 'victim_id', 'victim_name', 'victim_side',
                             'weapon', 'damage', 'blinded_time', 'flashbang_id', 'damage_armor', 'victim_health',
                             'victim_armor', 'hitgroup', 'hs', 'penetrated', 'throughsmoke', 'author_coord',
-                            'victim_coord']:
+                            'victim_coord', 'equipment', 'item_bought']:
 
         df = df[df['moment'].isin(['live', 'freeze_time'])]
 
-        df.dropna(subset=['time', 'author_id'], inplace=True)
+        df.dropna(subset=['time', 'type'], inplace=True)
         df['time'] = pd.to_datetime(df['time'], format=r'%m/%d/%Y - %H:%M:%S', errors='coerce')
 
-        df.fillna(value={'type': 'undefined'}, inplace=True)
+        # df.fillna(value={'type': 'undefined'}, inplace=True)
 
         df = df.where(df.notnull(), None)
 
@@ -65,9 +65,13 @@ def insert_to_database(df):
                    ,[penetrated]
                    ,[throughsmoke]
                    ,[author_coord]
-                   ,[victim_coord])
+                   ,[victim_coord]
+                   ,[equipment]
+                   ,[item_bought])
              VALUES
                    ( ?
+                   , ?
+                   , ?
                    , ?
                    , ?
                    , ?
