@@ -43,9 +43,9 @@ select p.mapnumber
 	 , SUM(case when "type" = 'killed' and author_side = 'TERRORIST' and equipment_value_ct < 7000 and not p."round" in (1, 16) then 1 else 0 end) kills_eco_tr
 	 , SUM(case when "type" = 'assisted killing' and author_side = 'CT' and victim_side = 'TERRORIST' then 1 else 0 end) assists_ct
 	 , SUM(case when "type" = 'assisted killing' and victim_side = 'CT' and author_side = 'TERRORIST' then 1 else 0 end) assists_tr
-	 , COUNT(DISTINCT(p."round")) rounds
-	 , COUNT(DISTINCT(case when author_side = 'CT' then p."round" else NULL end)) rounds_ct
-	 , COUNT(DISTINCT(case when author_side = 'TERRORIST' then p."round" else NULL end)) rounds_tr
+	 , COUNT(DISTINCT(CONCAT(r.match_id, '|', r.mapnumber, '|', r."round"))) rounds
+	 , COUNT(DISTINCT(case when author_side = 'CT' then CONCAT(r.match_id, '|', r.mapnumber, '|', r."round") else NULL end)) rounds_ct
+	 , COUNT(DISTINCT(case when author_side = 'TERRORIST' then CONCAT(r.match_id, '|', r.mapnumber, '|', r."round") else NULL end)) rounds_tr
 	 , SUM(case when "type" = 'killed' and victim_side <> author_side and throughsmoke = 1 then 1 else 0 end) kills_smoke
 	 , SUM(case when "type" = 'killed' and victim_side <> author_side and weapon like '%knife%' then 1 else 0 end) kills_faca
 	 , SUM(case when "type" = 'Got_The_Bomb' then 1 else 0 end) pegou_c4
