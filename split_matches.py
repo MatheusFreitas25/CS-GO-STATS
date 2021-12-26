@@ -14,13 +14,14 @@ for lineno, line in enumerate(log):
         data = json.loads(data)
         curr = data['event']
         if curr in ['series_start',
-                    'going_live',
+                    # 'going_live',
                     # 'round_end',
                     'map_end',
                     'series_end']:
-
             if last[1] == 'inicio' and curr == 'series_start':
                 start_list.append(lineno)
+            # elif last[1] == 'series_start' and curr == 'series_start':
+            #     end_list.append(lineno - 1)
             elif last[1] == 'map_end' and curr == 'series_start':
                 end_list.append(last[0])
                 start_list.append(lineno)

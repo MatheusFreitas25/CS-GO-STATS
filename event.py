@@ -58,7 +58,9 @@ class Event:
     def get_type(self):
         player_events = ['attacked', 'threw flashbang', 'blinded', 'killed', 'left buyzone', 'say_team', 'say',
                          'threw molotov', 'committed suicide', 'changed name',
-                         'threw hegrenade', 'threw smokegrenade', 'purchased', 'Dropped_The_Bomb', 'Got_The_Bomb',
+                         'threw hegrenade', 'threw smokegrenade',
+                         # 'purchased',
+                         'Dropped_The_Bomb', 'Got_The_Bomb',
                          'switched from team', 'assisted killing', 'Planted_The_Bomb', 'Bomb_Begin_Plant',
                          'flash-assisted killing',
                          'Begin_Bomb_Defuse_With_Kit', 'Defused_The_Bomb', 'entered the game', 'disconnected',

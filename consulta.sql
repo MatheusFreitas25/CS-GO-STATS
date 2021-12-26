@@ -16,9 +16,11 @@ select mapnumber
 	 , SUM(case when "type" = 'killed' and victim_side = 'CT' and author_side = 'TERRORIST' then 1 else 0 end) kills_tr
 	 , SUM(case when "type" = 'assisted killing' and author_side = 'CT' and victim_side = 'TERRORIST' then 1 else 0 end) assists_ct
 	 , SUM(case when "type" = 'assisted killing' and victim_side = 'CT' and author_side = 'TERRORIST' then 1 else 0 end) assists_tr
+	 , COUNT(DISTINCT("round")) rounds
 	 , COUNT(DISTINCT(case when author_side = 'CT' then "round" else NULL end)) rounds_ct
 	 , COUNT(DISTINCT(case when author_side = 'TERRORIST' then "round" else NULL end)) rounds_tr
 	 , SUM(case when "type" = 'killed' and victim_side <> author_side and throughsmoke = 1 then 1 else 0 end) kills_smoke
+	 , SUM(case when "type" = 'killed' and victim_side <> author_side and weapon like '%knife%' then 1 else 0 end) kills_faca
 	 , SUM(case when "type" = 'Got_The_Bomb' then 1 else 0 end) pegou_c4
 	 , SUM(case when "type" = 'Dropped_The_Bomb' then 1 else 0 end) c4_dropada
 	 , SUM(case when "type" = 'Bomb_Begin_Plant' then 1 else 0 end) tentativa_plant_c4
@@ -56,6 +58,7 @@ select author_id
 	 , sum(kills_tr) kills_tr
 	 , sum(assists_ct) assists_ct
 	 , sum(assists_tr) assists_tr
+	 , sum(rounds) rounds
 	 , sum(rounds_ct) rounds_ct
 	 , sum(rounds_tr) rounds_tr
 	 , sum(kills_smoke) kills_smoke
@@ -66,6 +69,7 @@ select author_id
 	 , sum(tiros_acertados) tiros_acertados
 	 , sum(tiros_na_perna) tiros_na_perna
 	 , sum(tiros_na_cabeca) tiros_na_cabeca
+	 , sum(kills_faca) kills_faca
 from PLAYER_ROUND
 group by author_id, nome, mapnumber, map_name
 having sum(rounds_ct) + sum(rounds_tr) > 5
