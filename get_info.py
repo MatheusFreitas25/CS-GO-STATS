@@ -79,7 +79,7 @@ for file in onlyfiles:
     df = df[['lineno', 'time', 'moment', 'mapnumber', 'round', 'map_name', 'match_id', 'type', 'author_name', 'author_id',
              'author_side', 'victim_id', 'victim_name', 'victim_side', 'weapon', 'damage', 'blinded_time', 'flashbang_id',
              'damage_armor', 'victim_health', 'victim_armor', 'hitgroup', 'hs', 'penetrated', 'throughsmoke',
-             'author_coord', 'victim_coord', 'equipment', 'item_bought']]
+             'author_coord', 'victim_coord', 'equipment', 'item_bought', 'equipment_value']]
 
     print(df)
 

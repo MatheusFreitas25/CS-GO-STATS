@@ -9,6 +9,8 @@ select "match_id"
 	 , sum(case when "type" = 'Planted_The_Bomb' then 1 else 0 end) bomb_planted
 	 , sum(case when "type" in ('SFUI_Notice_Terrorists_Win', 'SFUI_Notice_Target_Bombed') then 1 else 0 end) t_win
 	 , sum(case when "type" in ('SFUI_Notice_CTs_Win', 'SFUI_Notice_Bomb_Defused', 'SFUI_Notice_Target_Saved') then 1 else 0 end) ct_win
+	 , sum(case when author_side = 'CT' and "type" = 'left buyzone' then equipment_value else 0 end) equipment_value_ct
+	 , sum(case when author_side = 'TERRORIST' and "type" = 'left buyzone' then equipment_value else 0 end) equipment_value_tr
 from ALL_EVENTS
 group by "match_id"
 	 , mapnumber
@@ -17,6 +19,8 @@ group by "match_id"
 order by "match_id"
 	 , mapnumber
 	 , "round"
+
+
 
 
 /*

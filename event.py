@@ -45,6 +45,7 @@ class Event:
         self.time = self.get_time()
         self.equipment = self.get_equipment()
         self.item_bought = self.get_item_bought()
+        self.equipment_value = self.get_equipment_value()
 
     def to_dict(self):
         attributes = vars(self)
@@ -59,7 +60,7 @@ class Event:
         player_events = ['attacked', 'threw flashbang', 'blinded', 'killed', 'left buyzone', 'say_team', 'say',
                          'threw molotov', 'committed suicide', 'changed name',
                          'threw hegrenade', 'threw smokegrenade',
-                         # 'purchased',
+                         'purchased',
                          'Dropped_The_Bomb', 'Got_The_Bomb',
                          'switched from team', 'assisted killing', 'Planted_The_Bomb', 'Bomb_Begin_Plant',
                          'flash-assisted killing',
@@ -240,6 +241,58 @@ class Event:
             if m:
                 result = str(tuple(m[0].split())).replace("'", "")
                 return result
+        except IndexError:
+            return None
+
+    def get_equipment_value(self):
+        try:
+            value = 0
+
+            armas = {
+                'weapon_deagle': 700,
+                'weapon_m4a1': 3100,
+                'weapon_flashbang': 200,
+                'weapon_smokegrenade': 300,
+                'weapon_incgrenade': 600,
+                'defuser': 400,
+                'kevlar(x)': 650,
+                'helmet': 350,
+                'knife': 0,
+                'weapon_glock': 200,
+                'weapon_ump45': 1200,
+                'weapon_usp_silencer': 200,
+                'weapon_mp9': 1250,
+                'weapon_hegrenade': 300,
+                'weapon_mac10': 1050,
+                'weapon_molotov': 400,
+                'weapon_awp': 4750,
+                'weapon_c4': 0,
+                'weapon_ak47': 2700,
+                'weapon_p250': 300,
+                'weapon_taser': 200,
+                'weapon_galilar': 1800,
+                'weapon_ssg08': 1750,
+                'weapon_tec9': 500,
+                'weapon_cz75a': 500,
+                'weapon_decoy': 50,
+                'weapon_sg556': 3000,
+                'weapon_fiveseven': 500,
+                'weapon_elite': 400,
+                'weapon_famas': 2050,
+                'weapon_mag7': 1800,
+                'weapon_aug': 3100,
+                'weapon_hkp2000': 200,
+                'weapon_p90': 2300,
+                'weapon_mp7': 1500,
+                'weapon_g3sg1': 5000}
+
+            m = re.findall('left buyzone with \[ (.+?) \]', self.line)
+            if m:
+                result = str(tuple(m[0].split())).replace("'", "")
+                for arma in armas.keys():
+                    if arma in result:
+                        value += armas[arma]
+                return value
         except IndexError:
             return None
 
