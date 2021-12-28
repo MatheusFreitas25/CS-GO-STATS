@@ -44,6 +44,11 @@ select p.mapnumber
 	 , SUM(case when "type" = 'assisted killing' and author_side = 'CT' and victim_side = 'TERRORIST' then 1 else 0 end) assists_ct
 	 , SUM(case when "type" = 'assisted killing' and victim_side = 'CT' and author_side = 'TERRORIST' then 1 else 0 end) assists_tr
 	 , COUNT(DISTINCT(CONCAT(r.match_id, '|', r.mapnumber, '|', r."round"))) rounds
+	 ,  COUNT(DISTINCT( case when p."round" in (1, 16) then CONCAT(r.match_id, '|', r.mapnumber, '|', r."round") else null end)) rounds_pistol
+	 , SUM(case when "type" = 'killed' and author_side = 'CT' and victim_side = 'TERRORIST' and p."round" in (1, 16) then 1 else 0 end) kills_ct_pistol
+	 , SUM(case when "type" = 'killed' and victim_side = 'CT' and author_side = 'TERRORIST' and p."round" in (1, 16) then 1 else 0 end) kills_tr_pistol
+	 , COUNT(DISTINCT(case when author_side = 'CT'  and p."round" in (1, 16) then CONCAT(r.match_id, '|', r.mapnumber, '|', r."round") else NULL end)) rounds_ct_pistol
+	 , COUNT(DISTINCT(case when author_side = 'TERRORIST'  and p."round" in (1, 16) then CONCAT(r.match_id, '|', r.mapnumber, '|', r."round") else NULL end)) rounds_tr_pistol
 	 , COUNT(DISTINCT(case when author_side = 'CT' then CONCAT(r.match_id, '|', r.mapnumber, '|', r."round") else NULL end)) rounds_ct
 	 , COUNT(DISTINCT(case when author_side = 'TERRORIST' then CONCAT(r.match_id, '|', r.mapnumber, '|', r."round") else NULL end)) rounds_tr
 	 , SUM(case when "type" = 'killed' and victim_side <> author_side and throughsmoke = 1 then 1 else 0 end) kills_smoke
@@ -109,6 +114,7 @@ select p.author_id
 	 , p.nome
 	 , p.mapnumber
 	 , p.map_name
+	 , p.match_id
 	 , sum(flashbangs_usadas) bangs
 	 , sum(flash_cegou_inimigo) flash_cegou_inimigo
 	 , sum(flash_cegou_amigo) flash_cegou_amigo
@@ -126,6 +132,11 @@ select p.author_id
 	 , sum(rounds) rounds
 	 , sum(rounds_ct) rounds_ct
 	 , sum(rounds_tr) rounds_tr
+	 , sum(rounds_pistol) rounds_pistol
+	 , sum(rounds_ct_pistol) rounds_ct_pistol
+	 , sum(rounds_tr_pistol) rounds_tr_pistol
+	 , sum(kills_ct_pistol) kills_ct_pistol
+	 , sum(kills_tr_pistol) kills_tr_pistol
 	 , sum(kills_smoke) kills_smoke
 	 , sum(pegou_c4) pegou_c4
 	 , sum(c4_dropada) c4_dropada
@@ -157,4 +168,5 @@ group by p.author_id
 	 , p.nome
 	 , p.mapnumber
 	 , p.map_name
+	 , p.match_id
 having sum(rounds_ct) + sum(rounds_tr) > 5
